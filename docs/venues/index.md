@@ -3,94 +3,158 @@ lastUpdated: true
 ---
 
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 
-onMounted(() => {
-  // 动态加载 Leaflet CSS
-  const link = document.createElement('link')
-  link.rel = 'stylesheet'
-  link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
-  document.head.appendChild(link)
+const venues = ref([])
+const loading = ref(true)
+const userLocation = ref(null)
+const maxDistance = 10 // 单位：公里，只显示10公里以内的场馆
 
-  // 动态加载 Leaflet JS
-  const script = document.createElement('script')
-  script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
-  script.onload = () => {
-    const map = L.map('venue-map').setView([39.9147, 116.4106], 12)
+onMounted(async () => {
+  // 动态加载 Leaflet 样式和脚本
+  await loadLeaflet()
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
-      maxZoom: 18
-    }).addTo(map)
-
-    // 加载场馆数据
-    fetch('/venues/data.json')
-      .then(res => res.json())
-      .then(venues => {
-        venues.forEach(v => {
-          const marker = L.marker([v.lat, v.lng])
-            .addTo(map)
-            .bindPopup(`
-              <div style="min-width:200px">
-                <strong style="font-size:15px">${v.name}</strong>
-                <span style="color:#f59e0b;margin-left:8px">${'⭐'.repeat(Math.round(Number(v.rating) || 4))}</span>
-                <hr style="margin:6px 0">
-                <p style="margin:4px 0">📍 ${v.address}</p>
-                <p style="margin:4px 0">📞 ${v.phone}</p>
-                <p style="margin:4px 0">🕐 ${v.hours}</p>
-                <p style="margin:4px 0;color:#666">${(v.features || []).join(' · ')}</p>
-              </div>
-            `)
-        })
-      })
-      .catch(err => {
-        console.error('加载场馆数据失败:', err)
-      })
-
-    // 定位用户位置
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        pos => {
-          const userIcon = L.divIcon({
-            className: 'user-location-icon',
-            html: '<div style="background:#4f46e5;width:16px;height:16px;border-radius:50%;border:3px solid white;box-shadow:0 0 8px rgba(79,70,229,0.6)"></div>',
-            iconSize: [16, 16],
-            iconAnchor: [8, 8]
-          })
-          L.marker([pos.coords.latitude, pos.coords.longitude], { icon: userIcon })
-            .addTo(map)
-            .bindPopup('<b>📍 你的位置</b>')
-            .openPopup()
-          map.setView([pos.coords.latitude, pos.coords.longitude], 13)
-        },
-        err => {
-          console.log('定位失败:', err.message)
-        }
-      )
-    }
+  // 获取场馆数据
+  try {
+    const res = await fetch(import.meta.env.BASE_URL + 'venues/data.json')
+    venues.value = await res.json()
+  } catch (e) {
+    console.error('加载场馆数据失败', e)
+  } finally {
+    loading.value = false
   }
-  document.head.appendChild(script)
+
+  // 尝试获取用户位置
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      pos => {
+        userLocation.value = [pos.coords.latitude, pos.coords.longitude]
+        initMap()
+      },
+      err => {
+        console.warn('无法获取位置，使用默认视角', err)
+        // 默认显示珠海（如果用户拒绝定位，则回退到珠海市区）
+        userLocation.value = [22.2707, 113.5767]
+        initMap()
+      }
+    )
+  } else {
+    // 浏览器不支持定位
+    userLocation.value = [22.2707, 113.5767] // 珠海
+    initMap()
+  }
 })
+
+function loadLeaflet() {
+  return new Promise((resolve) => {
+    if (window.L) {
+      resolve()
+      return
+    }
+    const link = document.createElement('link')
+    link.rel = 'stylesheet'
+    link.href = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'
+    document.head.appendChild(link)
+
+    const script = document.createElement('script')
+    script.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+    script.onload = resolve
+    document.head.appendChild(script)
+  })
+}
+
+function getDistance(latlng1, latlng2) {
+  // 球面余弦距离（足够用于几公里内的计算）
+  const [lat1, lon1] = latlng1
+  const [lat2, lon2] = latlng2
+  const R = 6371 // 地球半径(km)
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLon = (lon2 - lon1) * Math.PI / 180
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  return R * c
+}
+
+function initMap() {
+  if (!userLocation.value) return
+
+  const map = L.map('map').setView(userLocation.value, 14)
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map)
+
+  // 添加用户位置标记
+  L.marker(userLocation.value, {
+    icon: L.icon({
+      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+      iconSize: [25, 41],
+      iconAnchor: [12, 41]
+    })
+  }).addTo(map).bindPopup('<b>你的位置</b>').openPopup()
+
+  // 筛选附近的场馆
+  const nearbyVenues = venues.value.filter(v => {
+    const distance = getDistance(userLocation.value, [v.lat, v.lng])
+    return distance <= maxDistance
+  })
+
+  // 在地图上添加附近场馆的标记
+  nearbyVenues.forEach(v => {
+    const stars = '⭐'.repeat(Math.round(Number(v.rating) || 4))
+    const featuresHtml = (v.features || []).length > 0
+      ? `<p style="margin:4px 0;color:#666;font-size:12px">${(v.features || []).join(' · ')}</p>`
+      : ''
+    L.marker([v.lat, v.lng]).addTo(map)
+      .bindPopup(`
+        <div style="min-width:200px">
+          <strong style="font-size:15px">${v.name}</strong>
+          <span style="color:#f59e0b;margin-left:6px">${stars}</span>
+          <hr style="margin:6px 0">
+          <p style="margin:4px 0">📍 ${v.address}</p>
+          <p style="margin:4px 0">📞 ${v.phone || '暂无'}</p>
+          <p style="margin:4px 0">🕐 ${v.hours || '未知'}</p>
+          ${featuresHtml}
+        </div>
+      `)
+  })
+
+  // 更新下方的表格
+  updateVenueTable(nearbyVenues)
+}
+
+function updateVenueTable(venuesList) {
+  const tableBody = document.getElementById('venue-table-body')
+  if (!tableBody) return
+  tableBody.innerHTML = venuesList.length > 0
+    ? venuesList.map(v => `
+      <tr>
+        <td><strong>${v.name}</strong></td>
+        <td>${v.address}</td>
+        <td>${v.phone || '暂无'}</td>
+        <td>${v.hours || '未知'}</td>
+        <td>${v.rating ? '⭐' + v.rating : '-'}</td>
+      </tr>`).join('')
+    : `<tr><td colspan="5" style="text-align:center;padding:24px;color:#999">附近 ${maxDistance} 公里内暂无收录场馆，欢迎推荐！</td></tr>`
+}
 </script>
 
 # 📍 附近麻将馆
 
-<div id="venue-map" style="height: 500px; width: 100%; border-radius: 12px; margin: 20px 0; box-shadow: 0 2px 12px rgba(0,0,0,0.1);"></div>
+<div id="map" style="height: 500px; width: 100%; margin: 20px 0; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);"></div>
 
----
+## 场馆列表（{{ maxDistance }}公里内）
 
-## 🏠 场馆列表
-
-点击地图上的标记查看详细信息，或浏览下方列表：
-
-| 名称 | 地址 | 电话 | 营业时间 | 评分 |
-|------|------|------|----------|------|
-| 大众棋牌室（王府井店） | 北京市东城区王府井大街138号 | 010-65251234 | 10:00-02:00 | ⭐4.5 |
-| 雀友会所（国贸店） | 北京市朝阳区建国路88号SOHO现代城B1 | 010-85801234 | 24小时营业 | ⭐4.7 |
-| 老舍茶馆棋牌室 | 北京市西城区前门西大街3号 | 010-63036830 | 09:00-23:00 | ⭐4.8 |
-| 乐在棋中棋牌会所 | 北京市海淀区中关村大街15号 | 010-82561234 | 12:00-06:00 | ⭐4.3 |
-| 欢乐麻将馆（望京店） | 北京市朝阳区望京街10号 | 010-64721234 | 11:00-03:00 | ⭐4.4 |
-| 三缺一棋牌室 | 北京市西城区什刹海荷花市场 | 010-64011234 | 13:00-01:00 | ⭐4.6 |
+<table>
+  <thead>
+    <tr><th>名称</th><th>地址</th><th>电话</th><th>营业时间</th><th>评分</th></tr>
+  </thead>
+  <tbody id="venue-table-body">
+    <tr><td colspan="5">正在定位并加载数据...</td></tr>
+  </tbody>
+</table>
 
 ---
 
@@ -104,4 +168,4 @@ onMounted(() => {
 - **营业时间**：开门到关门的时间
 - **特色**：自动麻将桌、免费茶水、停车等
 
-也欢迎直接在 [GitHub](https://github.com) 上提交 PR 添加数据！
+也欢迎直接在 [GitHub](https://github.com/IPRshang/mahjong) 上提交 PR 添加数据！
