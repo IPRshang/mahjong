@@ -1,0 +1,85 @@
+/* 麻趣阁自定义主题 — 经典麻将红 */
+
+:root {
+  --vp-c-brand: #b61b1b;
+  --vp-c-brand-light: #d13434;
+  --vp-c-brand-lighter: #e85353;
+  --vp-c-brand-dark: #8b1515;
+  --vp-c-brand-darker: #6b1010;
+
+  --vp-c-brand-1: var(--vp-c-brand);
+  --vp-c-brand-2: var(--vp-c-brand-light);
+  --vp-c-brand-3: var(--vp-c-brand-lighter);
+  --vp-c-brand-soft: rgba(182, 27, 27, 0.08);
+
+  /* 首页渐变按钮 */
+  --vp-button-brand-bg: var(--vp-c-brand);
+  --vp-button-brand-hover-bg: var(--vp-c-brand-light);
+  --vp-button-brand-active-bg: var(--vp-c-brand-dark);
+
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(135deg, #b61b1b 30%, #d97706);
+}
+
+/* 导航栏激活状态 */
+.VPNavBarMenuLink.active {
+  color: var(--vp-c-brand) !important;
+}
+
+/* 侧边栏激活状态 */
+.VPSidebarItem.is-active > .item > .link > .text {
+  color: var(--vp-c-brand) !important;
+}
+
+/* 地图容器响应式高度 */
+@media (max-width: 768px) {
+  #venue-map {
+    height: 300px !important;
+  }
+}
+
+/* 好物卡片图 hover 放大 */
+.goods-card:hover .goods-img img {
+  transform: scale(1.05);
+}
+
+.goods-img img {
+  transition: transform 0.3s ease;
+}
+
+/* 主播卡片 */
+.streamer-card {
+  background: var(--vp-c-bg-soft);
+  border-radius: 12px;
+  padding: 20px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.streamer-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+/* 更好的表格样式 */
+.vp-doc table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.vp-doc th {
+  background: var(--vp-c-brand-soft);
+}
+
+/* 自定义滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--vp-c-brand-light);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}

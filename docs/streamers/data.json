@@ -1,0 +1,68 @@
+[
+  {
+    "name": "麻将一哥",
+    "platform": "B站",
+    "style": "搞笑教学",
+    "liveTime": "每晚 20:00-23:00",
+    "videoUrl": "https://player.bilibili.com/player.html?bvid=BV1xx411c7mC",
+    "avatar": "https://placehold.co/100/fb7299/white?text=麻将一哥",
+    "roomUrl": "https://live.bilibili.com/",
+    "description": "用最幽默的方式讲解最硬核的麻将技巧，新手必看！",
+    "fans": "50万+"
+  },
+  {
+    "name": "雀神阿强",
+    "platform": "抖音",
+    "style": "实战解说",
+    "liveTime": "每天 14:00-18:00 / 20:00-24:00",
+    "videoUrl": "https://www.douyin.com/user/",
+    "avatar": "https://placehold.co/100/000000/white?text=雀神阿强",
+    "roomUrl": "https://live.douyin.com/",
+    "description": "每天在线实战，边打边讲解思路，学技术的最佳选择。",
+    "fans": "80万+"
+  },
+  {
+    "name": "日麻小课堂",
+    "platform": "B站",
+    "style": "日本麻将教学",
+    "liveTime": "周一至周五 19:30-22:00",
+    "videoUrl": "https://player.bilibili.com/player.html?bvid=BV1GJ411x7Ea",
+    "avatar": "https://placehold.co/100/fb7299/white?text=日麻",
+    "roomUrl": "https://live.bilibili.com/",
+    "description": "从零开始学日本麻将，天凤/雀魂实战教学，温和耐心。",
+    "fans": "20万+"
+  },
+  {
+    "name": "川麻老张",
+    "platform": "抖音",
+    "style": "四川麻将实战",
+    "liveTime": "每晚 19:00-02:00",
+    "videoUrl": "https://www.douyin.com/user/",
+    "avatar": "https://placehold.co/100/000000/white?text=川麻",
+    "roomUrl": "https://live.douyin.com/",
+    "description": "纯正川麻血战到底，每天上演精彩牌局。",
+    "fans": "35万+"
+  },
+  {
+    "name": "麻将小姐姐",
+    "platform": "B站",
+    "style": "娱乐搞笑",
+    "liveTime": "周末 15:00-21:00",
+    "videoUrl": "https://player.bilibili.com/player.html?bvid=BV1ft4y1U7hx",
+    "avatar": "https://placehold.co/100/fb7299/white?text=小姐姐",
+    "roomUrl": "https://live.bilibili.com/",
+    "description": "麻将也能这么有趣！搞笑剪辑 + 精彩瞬间集锦。",
+    "fans": "15万+"
+  },
+  {
+    "name": "高手在民间",
+    "platform": "快手",
+    "style": "民间高手",
+    "liveTime": "不定期直播",
+    "videoUrl": "https://www.kuaishou.com/",
+    "avatar": "https://placehold.co/100/ff4906/white?text=高手",
+    "roomUrl": "https://live.kuaishou.com/",
+    "description": "各地民间麻将高手齐聚，不同打法尽收眼底。",
+    "fans": "10万+"
+  }
+]
