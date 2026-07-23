@@ -103,15 +103,14 @@ function initMap() {
 
   // 在地图上添加附近场馆的标记
   nearbyVenues.forEach(v => {
-    const stars = '⭐'.repeat(Math.round(Number(v.rating) || 4))
     const featuresHtml = (v.features || []).length > 0
-      ? `<p style="margin:4px 0;color:#666;font-size:12px">${(v.features || []).join(' · ')}</p>`
+      ? `<p style="margin:4px 0;color:#666;font-size:12px">🏷️ ${(v.features || []).join(' · ')}</p>`
       : ''
     L.marker([v.lat, v.lng]).addTo(map)
       .bindPopup(`
         <div style="min-width:200px">
           <strong style="font-size:15px">${v.name}</strong>
-          <span style="color:#f59e0b;margin-left:6px">${stars}</span>
+          <span style="color:#666;margin-left:6px;font-size:12px">${v.city || ''}</span>
           <hr style="margin:6px 0">
           <p style="margin:4px 0">📍 ${v.address}</p>
           <p style="margin:4px 0">📞 ${v.phone || '暂无'}</p>
@@ -132,10 +131,10 @@ function updateVenueTable(venuesList) {
     ? venuesList.map(v => `
       <tr>
         <td><strong>${v.name}</strong></td>
+        <td><span class="city-tag">${v.city || '-'}</span></td>
         <td>${v.address}</td>
         <td>${v.phone || '暂无'}</td>
         <td>${v.hours || '未知'}</td>
-        <td>${v.rating ? '⭐' + v.rating : '-'}</td>
       </tr>`).join('')
     : `<tr><td colspan="5" style="text-align:center;padding:24px;color:#999">附近 ${maxDistance} 公里内暂无收录场馆，欢迎推荐！</td></tr>`
 }
@@ -149,7 +148,7 @@ function updateVenueTable(venuesList) {
 
 <table>
   <thead>
-    <tr><th>名称</th><th>地址</th><th>电话</th><th>营业时间</th><th>评分</th></tr>
+    <tr><th>名称</th><th>城市</th><th>地址</th><th>电话</th><th>营业时间</th></tr>
   </thead>
   <tbody id="venue-table-body">
     <tr><td colspan="5">正在定位并加载数据...</td></tr>

@@ -83,3 +83,14 @@
 ::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* 城市标签 */
+.city-tag {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand);
+}
