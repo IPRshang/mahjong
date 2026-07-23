@@ -2,6 +2,7 @@ export default {
   title: '麻趣阁',
   description: '学技巧 · 找场馆 · 看主播 · 买好物 · 约牌局',
   lang: 'zh-CN',
+  base: '/mahjong/',
   lastUpdated: true,
 
   markdown: {
