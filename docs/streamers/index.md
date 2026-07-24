@@ -3,20 +3,12 @@ lastUpdated: true
 ---
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, computed } from 'vue'
+import streamersData from './data.json'
 
-const streamers = ref([])
+const streamers = ref(streamersData)
 const activePlatform = ref('全部')
 const platforms = ['全部', 'B站', '抖音', '快手', 'YouTube']
-
-onMounted(async () => {
-  try {
-    const res = await fetch(import.meta.env.BASE_URL + 'streamers/data.json')
-    streamers.value = await res.json()
-  } catch (e) {
-    console.error('加载主播数据失败:', e)
-  }
-})
 
 const filteredStreamers = computed(() => {
   if (activePlatform.value === '全部') return streamers.value
